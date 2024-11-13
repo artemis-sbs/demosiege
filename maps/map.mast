@@ -1,2 +1,67 @@
-@map/first_map "Hello Cosmos"
-" This is my first map.
+@map/first_map "Artemis: Cosmos - Demo"
+" This is a demo for Artemis: Cosmos. 
+" For the full game please visit
+" https://www.artemisspaceshipbridge.com/buy-cosmos-now.html
+
+
+terrain_value = terrain_to_value(terrain_select)
+
+#------------------------------------------------------------------------------------------------------------
+demo_spawn_stations(difficulty, 0)
+demo_asteroid_clusters(terrain_value)
+terrain_spawn_nebula_clusters(terrain_value)
+
+ 
+fleet_count = 3 + int(difficulty/2)
+fleet_index = int(difficulty - 1)
+for a in range(fleet_count):
+    enemy = "Kralien"
+    fleet_pos = Vec3.rand_in_sphere(39990, 40000, False, True)
+    create_siege_fleet(enemy, fleet_index, fleet_pos.x, fleet_pos.y, fleet_pos.z)
+
+#------------------------------------------------------------------------------------------------------------
+await task_schedule(spawn_players)
+
+task_schedule(task_end_game)
+
+
+============ task_end_game ======= 
+
+await delay_sim(4)
+
+if is_timer_set(SHARED, "time_limit") and is_timer_finished(SHARED, "time_limit"):
+    left = role("raider")
+    c = len(left)
+    # End attack
+    remove_role(left, "raider")
+    start_text = "Mission time has run out! {c} enemies left."
+    game_started = False
+    game_ended = True
+    sbs.play_music_file(0, "music/default/victory")
+    #gui_reroute_clients(show_game_results)
+    #gui_reroute_server(show_game_results)
+    signal_emit("show_game_results", None)
+    ->END
+
+stations = role('tsn') & role('station')
+if len(stations) ==0:
+    start_text = "Mission is lost!  All yer base are belong to us, dammit."
+    game_started = False
+    game_ended = True
+
+    sbs.play_music_file(0, "music/default/failure")
+    signal_emit("show_game_results", None)
+
+    ->END
+
+raiders = role('Raider')
+# print (f"raiders {len(raiders)}")
+if len(raiders)==0 and world_select.path !="peacetime":
+    start_text = "Mission is won!  All the enemies have been destroyed."
+    game_started = False
+    game_ended = True
+    sbs.play_music_file(0, "music/default/victory")
+    signal_emit("show_game_results", None)
+    ->END
+
+-> task_end_game
