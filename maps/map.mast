@@ -1,3 +1,84 @@
+
+//damage/internal if has_role(DAMAGE_ORIGIN_ID, "__player__") and EVENT.sub_tag == "maelstrom"
+explode_player_ship(DAMAGE_ORIGIN_ID)
+
+
+#
+#
+# This handles when a player ships is destroyed
+# The default is to is to truly delete it
+# 
+#
+//shared/signal/player_ship_destroyed
+
+    print("story: Exploded Deleting player_ship")
+    yield success if get_shared_inventory_value("game_ended", False)
+
+    so = to_object(DESTROYED_ID)
+    if so is not None:
+        <all>
+        % {so.name} has perished
+        % {so.name} has blown up
+        % lost contact with {so.name} 
+
+    # await delay_sim(1)
+
+    so = to_object(DESTROYED_ID)
+    if so is not None:
+        sbs.delete_object(DESTROYED_ID)
+
+    await delay_sim(1)
+
+    start_text = "Mission is lost!  All the player ships have been destroyed."
+    game_started = False
+    game_ended = True
+    sbs.play_music_file(0, "music/default/failure")
+    signal_emit("show_game_results", None)
+
+
+//signal/show_game_results
+    await delay_app(10)
+    signal_emit("show_demo_info", None)
+    
+
+//signal/show_demo_info
+
+gui_section(style="area:5,5,95,95-128px;background: #2222FF44;")
+"""
+$t Thank you for playing Artemis Cosmos!  
+
+The full version includes:
+
+- many more player ships to use
+- shuttles and fighters you can fly!
+- another whole player race, with the Jump Drive
+- five distinctly different enemy races to fight
+- elite enemies that can cloak, teleport, and much more
+- complex story missions
+- black holes!
+- power-ups to collect
+- extensible scripting system built on Python
+- play multiple player ships in the same space
+
+visit:
+    https://www.artemisspaceshipbridge.com/buy-cosmos-now.html
+"""
+
+
+g = 32
+w = 128
+h = 128
+x = 0
+y = 0
+gui_section( style=f"area: 100-{x+w+g}px, 100-{y+h+g}px, 100-{x+g}px, 100-{y+g}px;")
+gui_image_keep_aspect_ratio_center(get_mission_dir_filename("media/artemis_home_page"))
+
+await gui()
+
+
+
+
+
 @map/first_map "Artemis: Cosmos - Demo"
 " This is a demo for Artemis: Cosmos. 
 " For the full game please visit

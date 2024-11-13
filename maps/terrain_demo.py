@@ -24,7 +24,7 @@ def demo_spawn_stations(difficulty, lethal_value, x_min=-32500, x_max=32500, cen
     #print(f"Station Center at: {pos.x} {pos.y} {pos.z}")
     # for each station
     for index in range(num_stations):
-        stat_type = "starbase_command"
+        stat_type = "starbase_civil"
         pos.x = center.x + random.uniform(x_min, x_max)
         pos.y = center.y + random.random()*2000-1000
         pos.z = center.z + startZ #+ random.random()*station_step/3  -   station_step/6
